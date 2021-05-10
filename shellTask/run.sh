@@ -1,4 +1,43 @@
 #!/bin/sh
+
+addGender(){
+local inputFile=$1
+local outputFile=$2
+echo "[" >$outputFile
+n=1
+i=0
+
+
+until [  "$(jq .[$i] $inputFile)" == null ]
+do
+	if [ $n -eq 1 ]
+	then
+		echo "{" >>$outputFile
+	else
+		echo "," >>$outputFile
+		echo "{" >>$outputFile
+	fi 
+	
+	echo '"Index"':$n, >>$output
+	echo '"Year"':$(jq .[$i].Year $inputFile), >>$outputFile
+	echo '"Age"':$(jq .[$i].Age $inputFile), >>$outputFile
+	echo '"Name"':$(jq .[$i].Name $inputFile), >>$outputFile
+	echo '"Movie"':$(jq .[$i].Movie $inputFile), >>$outputFile
+	echo '"Gender"':$(jq .[$i].Gender $inputFile) >>$outputFile
+	echo '}' >>$outputFile
+
+
+
+	i=$(( i+1 ))
+	n=$(( n+1 ))
+
+done
+
+echo "]" >>$outputFile
+
+}
+
+###################################################
 ############## first file ################
 file1Name="oscar_age_male.json"
 file1Link="https://assets.harridev.com/interview/oscar_age_male.json"
@@ -26,6 +65,8 @@ fi
 #################### read from JSON then print in output file############################
 output="oscar_age_gender.json"
 merge="merge.json"
+####################################################################
+
 
 echo "[" >$merge
 n=1
@@ -56,7 +97,7 @@ do
 	n=$(( n+1 ))
 
 done
-
+################################################################
 i=0
 until [ "$(jq .[$i] $file2Name)" == null ]
 do
@@ -81,42 +122,16 @@ do
 done
 
 echo "]" >>$merge
-
+############################################# DONE#####################################
 cat $merge | jq '. |= sort_by(.Year)' >$merge
 
 ############# merge hace outputs sorted by years but index is not true###############
+#################
+
+addGender $merge $output
+
+####################################################
 
 
-echo "[" >$output
-n=1
-i=0
-
-
-until [  "$(jq .[$i] $merge)" == null ]
-do
-	if [ $n -eq 1 ]
-	then
-		echo "{" >>$output
-	else
-		echo "," >>$output
-		echo "{" >>$output
-	fi 
-	
-	echo '"Index"':$n, >>$output
-	echo '"Year"':$(jq .[$i].Year $merge), >>$output
-	echo '"Age"':$(jq .[$i].Age $merge), >>$output
-	echo '"Name"':$(jq .[$i].Name $merge), >>$output
-	echo '"Movie"':$(jq .[$i].Movie $merge), >>$output
-	echo '"Gender"':$(jq .[$i].Gender $merge) >>$output
-	echo '}' >>$output
-
-
-
-	i=$(( i+1 ))
-	n=$(( n+1 ))
-
-done
-
-echo "]" >>$output
-cat $output | jq . >$output
+#cat $output | jq . >$output
 #rm $merge
