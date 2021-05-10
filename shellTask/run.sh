@@ -1,5 +1,4 @@
 #!/bin/sh
-
 ############## first file ################
 file1Name="oscar_age_female.json"
 file1Link= "https://assets.harridev.com/interview/oscar_age_female.json"
